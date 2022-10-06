@@ -1,5 +1,5 @@
 name: web3dart_ethereum
-description: A new Flutter package.
+description: Implementing a web3dart connection with browser extension (Metamask etc)
 version: 0.0.1
 homepage: https://github.com/inveker/web3dart_ethereum
 
