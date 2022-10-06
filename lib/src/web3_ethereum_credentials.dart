@@ -25,23 +25,6 @@ class Web3EthereumCredentials extends CredentialsWithKnownAddress implements Cus
   }) : address = EthereumAddress.fromHex(addressHex);
 
   @override
-  Future<MsgSignature> signToSignature(Uint8List payload, {int? chainId, bool isEIP1559 = false}) {
-    throw UnsupportedError('Signing raw payloads is not supported');
-  }
-
-  @override
-  Future<Uint8List> signPersonalMessage(Uint8List payload, {int? chainId}) async {
-    final response = await _web3ethereum.request(
-      'eth_sign',
-      params: [
-        address.hex,
-        _bytesToData(payload),
-      ],
-    );
-    return _responseToBytes(response);
-  }
-
-  @override
   Future<String> sendTransaction(Transaction transaction) async {
     return _web3ethereum.request<String>(
       'eth_sendTransaction',
@@ -57,6 +40,11 @@ class Web3EthereumCredentials extends CredentialsWithKnownAddress implements Cus
       ],
     );
   }
+
+  @override
+  Future<MsgSignature> signToSignature(Uint8List payload, {int? chainId, bool isEIP1559 = false}) {
+    throw UnsupportedError('Signing raw payloads is not supported');
+  }
 }
 
 // Auxiliary local utilities
@@ -67,10 +55,6 @@ String? _bigIntToQuantity(BigInt? int) {
 
 String? _intToQuantity(int? int) {
   return int != null ? '0x${int.toRadixString(16)}' : null;
-}
-
-Uint8List _responseToBytes(dynamic response) {
-  return hexToBytes(response as String);
 }
 
 String? _bytesToData(Uint8List? data) {
