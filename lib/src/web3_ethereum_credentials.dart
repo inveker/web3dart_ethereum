@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:web3_ethereum/web3_ethereum.dart';
 import 'package:web3dart/crypto.dart';
+import 'package:web3dart/json_rpc.dart';
 import 'package:web3dart/web3dart.dart';
 
 /// Custom Credentials compatible with web3dart library.
@@ -26,19 +27,23 @@ class Web3EthereumCredentials extends CredentialsWithKnownAddress implements Cus
 
   @override
   Future<String> sendTransaction(Transaction transaction) async {
-    return _web3ethereum.request<String>(
-      'eth_sendTransaction',
-      params: [
-        {
-          'from': address.hex,
-          'to': transaction.to?.hex,
-          'gasPrice': _bigIntToQuantity(transaction.gasPrice?.getInWei),
-          'gas': _intToQuantity(transaction.maxGas),
-          'value': _bigIntToQuantity(transaction.value?.getInWei),
-          'data': _bytesToData(transaction.data),
-        },
-      ],
-    );
+    try {
+      return _web3ethereum.request<String>(
+        'eth_sendTransaction',
+        params: [
+          {
+            'from': address.hex,
+            'to': transaction.to?.hex,
+            'gasPrice': _bigIntToQuantity(transaction.gasPrice?.getInWei),
+            'gas': _intToQuantity(transaction.maxGas),
+            'value': _bigIntToQuantity(transaction.value?.getInWei),
+            'data': _bytesToData(transaction.data),
+          },
+        ],
+      );
+    } on Web3EthereumException catch(e) {
+      throw RPCError(e.code, e.message, e.data);
+    }
   }
 
   @override

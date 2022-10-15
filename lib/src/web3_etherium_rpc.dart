@@ -17,7 +17,11 @@ class Web3EthereumRpc extends RpcService {
 
   @override
   Future<RPCResponse> call(String function, [List? params]) async {
-    final res = await _web3ethereum.request(function, params: params);
-    return RPCResponse(0, res);
+    try {
+      final res = await _web3ethereum.request(function, params: params);
+      return RPCResponse(0, res);
+    } on Web3EthereumException catch(e) {
+      throw RPCError(e.code, e.message, e.data);
+    }
   }
 }
